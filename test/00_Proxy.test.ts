@@ -27,7 +27,7 @@ describe("Proxy contract deployment & tests on zkEVM", async () => {
 
         // deploy the contract
         const proxy = await proxyContractFactory.deploy();
-        // const erc20Token = await upgrades.deployProxy(erc20TokenFactory);
+        // const proxy = await upgrades.deployProxy(erc20TokenFactory);
 
         // wait for the contract to get deployed
         await proxy.deployed();
