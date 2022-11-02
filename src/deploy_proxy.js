@@ -7,7 +7,6 @@ async function main() {
   const contract = await upgrades.deployProxy(Contract);
 
   await contract.deployed();
-
   console.log("deployed to:", contract.address);
 }
 
