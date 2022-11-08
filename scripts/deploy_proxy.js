@@ -16,4 +16,8 @@ main()
   .catch((error) => {
     console.error(error);
     process.exit(1);
+<<<<<<< HEAD
   });
+=======
+  });
+>>>>>>> fefebeed46834dd8a5c16b21cbe32f5e96ede9eb

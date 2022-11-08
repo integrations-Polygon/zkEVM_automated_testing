@@ -19,4 +19,8 @@ contract Proxy is Initializable, OwnableUpgradeable {
     function set_value(uint256 _val) public {
         val= _val;
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> fefebeed46834dd8a5c16b21cbe32f5e96ede9eb

@@ -36,9 +36,14 @@
     "*.{ts,json,sol,md,yml}": "prettier --write"
   },
   "dependencies": {
+<<<<<<< HEAD
     "@openzeppelin/contracts": "^4.3.2",
     "@openzeppelin/contracts-upgradeable": "^4.7.3",
     "@openzeppelin/hardhat-upgrades": "^1.21.0",
+=======
+    "@openzeppelin/contracts": "^4.7.3",
+    "@openzeppelin/contracts-upgradeable": "^4.7.3"
+>>>>>>> fefebeed46834dd8a5c16b21cbe32f5e96ede9eb
     "dotenv": "^16.0.2",
     "prompt-sync": "^4.2.0"
   }
