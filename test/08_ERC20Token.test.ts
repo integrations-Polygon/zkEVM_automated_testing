@@ -1,12 +1,19 @@
 import { expect } from "chai";
 import dotenv from "dotenv";
 dotenv.config();
-import { setupWallet, zkEVM_provider, ownerSigner, userSigner, aliceSigner } from "./utils/setupWallet";
+import {
+    setupWallet,
+    zkEVM_provider,
+    ownerSigner,
+    adminSigner,
+    userSigner,
+    aliceSigner,
+} from "./utils/setupWallet";
 import { ethers, Contract } from "ethers";
 import { checkBalances } from "./utils/checkBalances";
-import { abi, bytecode } from "../artifacts/src/ERC20Token.sol/TestTokenERC20.json";
+import { abi, bytecode } from "../artifacts/src/erc_tokens_contracts/ERC20Token.sol/TestTokenERC20.json";
 
-describe("ERC20 Token deployment & tests on zkEVM", async () => {
+describe("ERC20 token deployment & tests on zkEVM", async () => {
     // declare an instance of the contract to be deployed
     let erc20TokenContract: any;
 
@@ -22,7 +29,7 @@ describe("ERC20 Token deployment & tests on zkEVM", async () => {
         console.log("Checking if wallet addresses have any balance....");
         await checkBalances(derivedNode);
 
-        console.log("\nDeploying ERC20 Token smart contract on zkEVM chain....");
+        console.log("\nDeploying ERC20 token smart contract on zkEVM chain....");
 
         // deploy the contract
         const erc20Token = await erc20TokenFactory.deploy();
@@ -33,91 +40,91 @@ describe("ERC20 Token deployment & tests on zkEVM", async () => {
         // get the instance of the deployed contract
         erc20TokenContract = new Contract(erc20Token.address, abi, zkEVM_provider);
 
-        console.log("\nERC20 Token contract deployed at: ", erc20TokenContract.address);
+        console.log("\nERC20 token contract deployed at: ", erc20TokenContract.address);
         console.log(
             `Contract Details: https://explorer.public.zkevm-test.net/address/${erc20TokenContract.address}`
         );
         console.log("\n");
     });
 
-    describe("ERC20 Token Token functionalities tests", async () => {
-        it("has correct token name", async () => {
+    describe("ERC20 token functionalities tests", async () => {
+        it("...has correct token name", async () => {
             expect(await erc20TokenContract.name()).eq("ERC20 Test Token");
         });
 
-        it("has correct token symbol", async () => {
+        it("...has correct token symbol", async () => {
             expect(await erc20TokenContract.symbol()).eq("TT20");
         });
 
-        it("mints on deployment", async () => {
-            expect(await erc20TokenContract.balanceOf(derivedNode[0].address)).eq(
+        it("...should mint ERC20 tokens on deployment", async () => {
+            expect(await erc20TokenContract.balanceOf(ownerSigner.getAddress())).eq(
                 ethers.utils.parseEther("1000000000")
             );
         });
 
-        it("can mint tokens", async () => {
+        it("...can mint ERC20 tokens", async () => {
             const mintTx = await erc20TokenContract
                 .connect(ownerSigner)
-                .mintERC20(derivedNode[3].address, ethers.utils.parseEther("10"));
+                .mintERC20(aliceSigner.getAddress(), ethers.utils.parseEther("10"));
             await mintTx.wait(1);
-            expect(await erc20TokenContract.balanceOf(derivedNode[3].address)).eq(
+            expect(await erc20TokenContract.balanceOf(aliceSigner.getAddress())).eq(
                 ethers.utils.parseEther("10")
             );
         });
 
-        it("transfers to other address", async () => {
+        it("...should allow owner to transfer ERC20 tokens to other address", async () => {
             const transferTx = await erc20TokenContract
                 .connect(ownerSigner)
-                .transfer(derivedNode[1].address, ethers.utils.parseEther("1"));
+                .transfer(adminSigner.getAddress(), ethers.utils.parseEther("1"));
             await transferTx.wait(1);
-            expect(await erc20TokenContract.balanceOf(derivedNode[1].address)).eq(
+            expect(await erc20TokenContract.balanceOf(adminSigner.getAddress())).eq(
                 ethers.utils.parseEther("1")
             );
         });
 
-        it("doesn't allow to transfer if insufficient balance", async () => {
+        it("...should not allow to transfer ERC20 tokens if insufficient balance", async () => {
             await expect(
                 erc20TokenContract
                     .connect(userSigner)
-                    .transfer(derivedNode[3].address, ethers.utils.parseEther("1000"))
+                    .transfer(aliceSigner.getAddress(), ethers.utils.parseEther("1000"))
             ).to.be.reverted;
         });
 
-        it("doesn't allow transferring to 0 address", async () => {
+        it("...should not allow transferring to 0 address", async () => {
             await expect(erc20TokenContract.transfer(ethers.constants.AddressZero, 100)).to.be.reverted;
         });
 
-        it("sets correct allowance", async () => {
+        it("...can sets correct allowance", async () => {
             const approveTx = await erc20TokenContract
                 .connect(ownerSigner)
-                .approve(derivedNode[2].address, ethers.utils.parseEther("1"));
+                .approve(userSigner.getAddress(), ethers.utils.parseEther("1"));
             await approveTx.wait(1);
 
-            expect(await erc20TokenContract.allowance(derivedNode[0].address, derivedNode[2].address)).eq(
+            expect(await erc20TokenContract.allowance(ownerSigner.getAddress(), userSigner.getAddress())).eq(
                 ethers.utils.parseEther("1")
             );
         });
 
-        it("allows to transferFrom", async () => {
+        it("...should allows to transferFrom", async () => {
             const transferTx = await erc20TokenContract
                 .connect(userSigner)
-                .transferFrom(derivedNode[0].address, derivedNode[2].address, 1000);
+                .transferFrom(ownerSigner.getAddress(), userSigner.getAddress(), 1000);
             await transferTx.wait(1);
 
-            expect(await erc20TokenContract.balanceOf(derivedNode[2].address)).eq(1000);
+            expect(await erc20TokenContract.balanceOf(userSigner.getAddress())).eq(1000);
         });
 
-        it("doesn't allow to transferFrom if insufficient allowance", async () => {
+        it("...should not allow to transferFrom if insufficient allowance", async () => {
             const tx = await erc20TokenContract
                 .connect(ownerSigner)
-                .approve(derivedNode[3].address, ethers.utils.parseEther("1"));
+                .approve(aliceSigner.getAddress(), ethers.utils.parseEther("1"));
             await tx.wait(1);
             await expect(
                 erc20TokenContract
                     .connect(aliceSigner)
                     .transferFrom(
-                        derivedNode[0].address,
-                        derivedNode[3].address,
+                        ownerSigner.getAddress(),
+                        aliceSigner.getAddress(),
                         ethers.utils.parseEther("10000")
                     )
             ).to.be.reverted;

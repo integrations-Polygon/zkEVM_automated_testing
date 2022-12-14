@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.7;
 
-import "./utils/AccessProtected.sol";
+import "../utils/AccessProtected.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
@@ -41,11 +41,10 @@ contract TestTokenERC1155 is ERC1155, Ownable, AccessProtected {
      * @param _receiver - test ERC1155 tokens will be issued to receiver
      * @param _amounts - array amount of test ERC1155 token you want to mint
      */
-    function mintBatchTestERC1155(address _receiver, uint256[] memory _amounts)
-        external
-        onlyAdmin
-        returns (uint256[] memory)
-    {
+    function mintBatchTestERC1155(
+        address _receiver,
+        uint256[] memory _amounts
+    ) external onlyAdmin returns (uint256[] memory) {
         uint256 lengthOfAmounts = _amounts.length;
         uint256[] memory tokenIds = new uint256[](lengthOfAmounts);
         for (uint256 i = 0; i < lengthOfAmounts; i++) {

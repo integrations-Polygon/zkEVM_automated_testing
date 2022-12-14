@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.7;
 
-import "./utils/AccessProtected.sol";
+import "../utils/AccessProtected.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
@@ -54,13 +54,9 @@ contract TestTokenERC721 is ERC721URIStorage, ERC721Enumerable, ERC721Burnable, 
      * returns the message sender
      */
 
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        virtual
-        override(ERC721, ERC721Enumerable)
-        returns (bool)
-    {
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view virtual override(ERC721, ERC721Enumerable) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 
@@ -86,11 +82,7 @@ contract TestTokenERC721 is ERC721URIStorage, ERC721Enumerable, ERC721Burnable, 
 
     /* ========== INTERNAL FUNCTIONS ========== */
 
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 id
-    ) internal override(ERC721, ERC721Enumerable) {
+    function _beforeTokenTransfer(address from, address to, uint256 id) internal override(ERC721, ERC721Enumerable) {
         super._beforeTokenTransfer(from, to, id);
     }
 
